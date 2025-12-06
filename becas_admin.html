@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Solicitudes de Beca</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    h1 {
+      text-align: center;
+    }
+    .nota {
+      font-size: 0.9em;
+      color: #555;
+    }
+    .solicitud {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 10px;
+    }
+    .solicitud img {
+      width: 120px;
+      height: auto;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      object-fit: cover;
+    }
+    .datos {
+      flex: 1;
+      font-size: 0.9em;
+    }
+    .datos p {
+      margin: 2px 0;
+    }
+    button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+    }
+    .btn-borrar-todo {
+      background: #d32f2f;
+      color: white;
+    }
+    .btn-recargar {
+      background: #4caf50;
+      color: white;
+    }
+    a.enlace-form {
+      display: inline-block;
+      margin-top: 10px;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #4caf50;
+      color: #4caf50;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Panel de Solicitudes de Beca</h1>
+<p class="nota">Las solicitudes se leen desde <code>localStorage</code> del navegador. Solo verás aquí las que se han llenado en este mismo dispositivo y navegador.</p>
+
+<a href="beca_extendida.html" class="enlace-form">Volver al formulario de solicitud</a>
+
+<div>
+  <button class="btn-recargar" onclick="cargarSolicitudes()">Recargar solicitudes</button>
+  <button class="btn-borrar-todo" onclick="borrarTodo()">Borrar todas las solicitudes</button>
+</div>
+
+<h2>Lista de solicitudes</h2>
+<div id="lista-solicitudes"></div>
+
+<script>
+  function obtenerSolicitudes() {
+    const guardado = localStorage.getItem("solicitudes_beca");
+    if (!guardado) return [];
+    try {
+      return JSON.parse(guardado);
+    } catch (e) {
+      console.error("Error al leer solicitudes guardadas", e);
+      return [];
+    }
+  }
+
+  function mostrarSolicitudes() {
+    const contenedor = document.getElementById("lista-solicitudes");
+    contenedor.innerHTML = "";
+    const solicitudes = obtenerSolicitudes();
+
+    if (solicitudes.length === 0) {
+      contenedor.innerHTML = "<p>No hay solicitudes guardadas.</p>";
+      return;
+    }
+
+    solicitudes.forEach(s => {
+      const div = document.createElement("div");
+      div.className = "solicitud";
+
+      const img = document.createElement("img");
+      img.src = s.foto || "";
+      img.alt = "Foto del estudiante";
+
+      const datos = document.createElement("div");
+      datos.className = "datos";
+
+      datos.innerHTML = `
+        <p><strong>Nombre:</strong> ${s.nombre}</p>
+        <p><strong>Fecha:</strong> ${s.fecha}</p>
+        <p><strong>Edad:</strong> ${s.edad} años</p>
+        <p><strong>Grado y grupo:</strong> ${s.grado}</p>
+        <p><strong>Promedio:</strong> ${s.promedio}</p>
+        <p><strong>Teléfono tutor:</strong> ${s.telefono || "No proporcionado"}</p>
+        <p><strong>Vive con:</strong> ${s.convive}</p>
+        <p><strong>Hermanos que estudian:</strong> ${s.hermanos}</p>
+        <p><strong>¿Trabaja?:</strong> ${s.trabaja}</p>
+        <p><strong>Ingresos del hogar:</strong> ${s.ingresos}</p>
+        <p><strong>Tipo de beca:</strong> ${s.tipoBeca}</p>
+        <p><strong>Motivo:</strong> ${s.motivo}</p>
+        <p><strong>Compromiso:</strong> ${s.compromiso}</p>
+      `;
+
+      div.appendChild(img);
+      div.appendChild(datos);
+      contenedor.appendChild(div);
+    });
+  }
+
+  function cargarSolicitudes() {
+    mostrarSolicitudes();
+  }
+
+  function borrarTodo() {
+    if (confirm("¿Seguro que deseas borrar todas las solicitudes guardadas?")) {
+      localStorage.removeItem("solicitudes_beca");
+      mostrarSolicitudes();
+    }
+  }
+
+  // Cargar al entrar
+  cargarSolicitudes();
+</script>
+
+</body>
+</html>
